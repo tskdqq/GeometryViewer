@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+
+<head>
+  <link rel="shortcut icon" href="../../public/favicon.ico">
+  <title>图的可视化</title>
+
+  <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+
+  <style type="text/css">
+    #mynetwork {
+      width: 1600px;
+      height: 900px;
+      border: 1px black solid;
+    }
+  </style>
+</head>
+
+<body>
+
+  <p>
+    ctrl + v 字符串，可视化图数据结构
+  </p>
+  <p>
+    [[1,2],[3,4]]
+  </p>
+
+  <div id="mynetwork"></div>
+
+  <script type="text/javascript">
+    document.addEventListener('paste', function (e) {
+      if (!e.clipboardData || !e.clipboardData.getData('Text')) { console.error('粘贴板错误'); }
+      // 获取剪切板内容
+      const arr = JSON.parse(e.clipboardData.getData('Text'));
+
+      const vertexes = new Set();
+      for (const [from, to] of arr) {
+        vertexes.add(from + '');
+        vertexes.add(to + '');
+      }
+      const nodeToIdxMap = new Map();
+      const nodes = [...vertexes].map((v, idx) => {
+        nodeToIdxMap.set(v, idx);
+        return { id: idx, label: v.toString() };
+      });
+      const edges = arr.map(([from, to]) => {
+        return {
+          from: nodeToIdxMap.get(from + ''),
+          to: nodeToIdxMap.get(to + ''),
+          arrows: 'to'
+        };
+      });
+
+      // create a network
+      const container = document.getElementById('mynetwork');
+      const data = {
+        nodes: nodes,
+        edges: edges
+      };
+      const options = {
+        interaction: { hover: true },
+        manipulation: {
+          enabled: true
+        }
+      };
+
+      const network = new vis.Network(container, data, options);
+    });
+
+  </script>
+
+</body>
+
+</html>
